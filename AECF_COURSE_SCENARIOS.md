@@ -4,7 +4,7 @@
 
 ---
 
-## Escenario 1 — `explain_behaviour`: Las 3 estrategias de persistencia y el cambio de perfil
+## Escenario 1 — `aecf_explain_behaviour`: Las 3 estrategias de persistencia y el cambio de perfil
 
 **¿Por qué es interesante?**
 Este proyecto incluye tres implementaciones completas del mismo contrato de repositorio: JPA pura con `EntityManager`, JDBC con `JdbcClient`, y Spring Data JPA. Cambiar de una a otra es solo pasar `-Dspring.profiles.active=jdbc`. Un desarrollador que llegue al código frío no entiende por qué existen tres versiones ni cómo funcionan los perfiles.
@@ -17,12 +17,14 @@ Este proyecto incluye tres implementaciones completas del mismo contrato de repo
 **¿Qué deberíamos ver?**
 Claude debe identificar los tres paquetes (`jpa/`, `jdbc/`, `springdatajpa/`), leer `business-config.xml`, explicar cómo Spring activa los beans según perfil, y producir una tabla comparativa de los tres enfoques con sus trade-offs de rendimiento.
 
-**Prompt de partida sugerido:**
-> "Explícame cómo funciona el sistema de repositorios de este proyecto. ¿Por qué hay tres implementaciones y cómo se activa cada una?"
+**Prompt AECF:**
+```
+@aecf run skill=aecf_explain_behaviour TOPIC=persistence_strategies prompt="Explica cómo funciona el sistema de repositorios de este proyecto. Hay tres implementaciones del mismo contrato (JPA, JDBC, Spring Data JPA) activadas por Spring profiles. ¿Por qué existen las tres, cómo se activa cada una y cuáles son sus trade-offs de rendimiento?"
+```
 
 ---
 
-## Escenario 2 — `new_feature`: Paginación en el listado de propietarios
+## Escenario 2 — `aecf_new_feature`: Paginación en el listado de propietarios
 
 **¿Por qué es interesante?**
 `OwnerController.processFindForm()` devuelve TODOS los owners que coincidan con el apellido buscado. Si hay miles de registros, la consulta devuelve todo. Es un bug de rendimiento realista y la feature de paginación es clásica en aplicaciones Spring MVC.
@@ -35,12 +37,14 @@ Claude debe identificar los tres paquetes (`jpa/`, `jdbc/`, `springdatajpa/`), l
 **¿Qué deberíamos ver?**
 Claude debe proponer cambios en `OwnerRepository` (añadir `Pageable`), `ClinicService`, `OwnerController`, y la vista `ownersList.jsp` para renderizar los controles de página. Debería también proponer un test de controlador.
 
-**Prompt de partida sugerido:**
-> "Añade paginación al listado de búsqueda de owners. Quiero mostrar 5 resultados por página con controles de siguiente/anterior."
+**Prompt AECF:**
+```
+@aecf run skill=aecf_new_feature TOPIC=owner_pagination prompt="Añadir paginación al listado de búsqueda de owners en OwnerController.processFindForm(). Actualmente devuelve todos los resultados sin límite. Mostrar 5 resultados por página con controles de siguiente/anterior. Modificar OwnerRepository, ClinicService, OwnerController y la vista ownersList.jsp."
+```
 
 ---
 
-## Escenario 3 — `refactor`: Eliminar el acoplamiento de EAGER loading
+## Escenario 3 — `aecf_refactor`: Eliminar el acoplamiento de EAGER loading
 
 **¿Por qué es interesante?**
 `Pet.visits` está mapeado como `FetchType.EAGER`. El propio código fuente incluye un comentario: `"There is a bug in this implementation. It would be more correct to use LAZY loading here, but EAGER is used to avoid [LazyInitializationException]"`. Es un caso clásico de deuda técnica documentada.
@@ -53,12 +57,14 @@ Claude debe proponer cambios en `OwnerRepository` (añadir `Pageable`), `ClinicS
 **¿Qué deberíamos ver?**
 Claude debe encontrar el `@OneToMany(fetch = FetchType.EAGER)` en `Pet.java`, rastrear todos los puntos donde se accede a `pet.getVisits()` fuera de contexto transaccional, y proponer la solución (inicializar dentro de una transacción activa o usar `@Transactional` correctamente en el servicio).
 
-**Prompt de partida sugerido:**
-> "Hay un comentario en el código que dice que se usa EAGER loading como workaround. Analiza el problema y propón un refactor correcto."
+**Prompt AECF:**
+```
+@aecf run skill=aecf_refactor TOPIC=eager_loading_fix prompt="El modelo Pet tiene una relación OneToMany con Visit mapeada como FetchType.EAGER. El propio código incluye un comentario de deuda técnica indicando que debería ser LAZY. Analizar todos los puntos de acceso a pet.getVisits(), trazar el impacto de cambiar a LAZY y proponer el refactor correcto sin introducir LazyInitializationException."
+```
 
 ---
 
-## Escenario 4 — `document_legacy`: Documentar la configuración XML
+## Escenario 4 — `aecf_document_legacy`: Documentar la configuración XML
 
 **¿Por qué es interesante?**
 `business-config.xml`, `mvc-core-config.xml`, `datasource-config.xml` y `tools-config.xml` son configuración Spring estilo pre-Boot. Para un desarrollador moderno que solo conoce `@SpringBootApplication` y `application.yml`, este XML es opaco.
@@ -71,12 +77,14 @@ Claude debe encontrar el `@OneToMany(fetch = FetchType.EAGER)` en `Pet.java`, ra
 **¿Qué deberíamos ver?**
 Claude debe producir un documento que explique qué hace cada archivo XML, qué beans registra, cómo se relacionan entre sí, y —opcionalmente— su equivalente en Spring Boot si se quisiera migrar.
 
-**Prompt de partida sugerido:**
-> "Documenta los archivos de configuración XML de `src/main/resources/spring/`. Explica qué hace cada uno y cómo se relacionan."
+**Prompt AECF:**
+```
+@aecf run skill=aecf_document_legacy TOPIC=spring_xml_config prompt="Documentar los cuatro archivos de configuración XML en src/main/resources/spring/ (business-config.xml, mvc-core-config.xml, datasource-config.xml, tools-config.xml). Para cada uno: qué beans registra, cómo se relaciona con los demás, qué perfiles Spring activa, y su equivalente conceptual en Spring Boot."
+```
 
 ---
 
-## Escenario 5 — `test_coverage`: Cubrir el repositorio JDBC
+## Escenario 5 — `aecf_new_test_set`: Cubrir el repositorio JDBC
 
 **¿Por qué es interesante?**
 `ClinicServiceJdbcTests` hereda de `AbstractClinicServiceTests` y se ejecuta con perfil `jdbc`, pero los tests son genéricos. Los detalles específicos de JDBC —como el `SimpleJdbcInsert`, el `RowMapper` personalizado o el manejo de tipos— no están probados de forma aislada.
@@ -89,12 +97,14 @@ Claude debe producir un documento que explique qué hace cada archivo XML, qué 
 **¿Qué deberíamos ver?**
 Claude debe leer `JdbcOwnerRepositoryImpl`, identificar lógica específica no cubierta (ej: el extractor de ResultSet para owners con múltiples pets), y generar tests que verifiquen el comportamiento del mapeo de datos.
 
-**Prompt de partida sugerido:**
-> "Analiza la cobertura de tests del repositorio JDBC. ¿Qué casos importantes no están cubiertos? Escribe los tests que faltan."
+**Prompt AECF:**
+```
+@aecf run skill=aecf_new_test_set TOPIC=jdbc_repository_tests prompt="Analizar la cobertura de tests del repositorio JDBC (JdbcOwnerRepositoryImpl, JdbcPetRepositoryImpl). Los tests actuales en ClinicServiceJdbcTests solo cubren el contrato genérico. Identificar los gaps en lógica específica de JDBC: RowMapper, ResultSetExtractor para owners con múltiples pets, SimpleJdbcInsert, y manejo de tipos. Generar los tests de integración que faltan usando perfil jdbc con H2."
+```
 
 ---
 
-## Escenario 6 — `explain_behaviour`: El aspecto de monitorización y su punto ciego
+## Escenario 6 — `aecf_explain_behaviour`: El aspecto de monitorización y su punto ciego
 
 **¿Por qué es interesante?**
 `CallMonitoringAspect` usa AOP para contar llamadas y medir tiempos en repositorios. Pero hay un comentario en el código: los repositorios de Spring Data JPA son proxies de interfaz y el aspecto no los intercepta correctamente. Es un bug arquitectural con causa técnica profunda.
@@ -107,12 +117,14 @@ Claude debe leer `JdbcOwnerRepositoryImpl`, identificar lógica específica no c
 **¿Qué deberíamos ver?**
 Claude debe leer `CallMonitoringAspect.java`, explicar el mecanismo de proxy de Spring Data JPA, y describir por qué el pointcut `within(org.springframework.samples.petclinic.repository..*)` no captura los beans generados dinámicamente.
 
-**Prompt de partida sugerido:**
-> "El aspecto de monitorización no funciona con Spring Data JPA. Explica por qué ocurre esto y cómo se podría solucionar."
+**Prompt AECF:**
+```
+@aecf run skill=aecf_explain_behaviour TOPIC=aop_monitoring_aspect prompt="CallMonitoringAspect usa AOP para monitorizar repositorios pero no funciona con Spring Data JPA. Explicar por qué el pointcut within(org.springframework.samples.petclinic.repository..*) no intercepta los repositorios de Spring Data JPA, qué mecanismo de proxy los diferencia de los repositorios JPA y JDBC, y qué opciones existen para solucionar el punto ciego."
+```
 
 ---
 
-## Escenario 7 — `new_feature`: Endpoint REST para vets con OpenAPI
+## Escenario 7 — `aecf_new_feature`: Endpoint REST para vets con OpenAPI
 
 **¿Por qué es interesante?**
 `VetController` ya devuelve JSON y XML via content negotiation sobre `GET /vets`. Es un punto de partida para añadir una API REST completa documentada con OpenAPI/Swagger. La feature es concreta, acotada y demuestra bien el razonamiento sobre capas.
@@ -125,12 +137,14 @@ Claude debe leer `CallMonitoringAspect.java`, explicar el mecanismo de proxy de 
 **¿Qué deberíamos ver?**
 Claude debe añadir la dependencia de SpringDoc OpenAPI a `pom.xml`, crear un `VetRestController` (o enriquecer el existente), añadir anotaciones `@Operation`/`@ApiResponse`, y verificar que el endpoint `/v3/api-docs` funciona.
 
-**Prompt de partida sugerido:**
-> "Añade documentación OpenAPI al endpoint de vets. Quiero poder ver el swagger-ui con los endpoints disponibles."
+**Prompt AECF:**
+```
+@aecf run skill=aecf_new_feature TOPIC=vet_rest_api prompt="Añadir documentación OpenAPI al endpoint de veterinarios. VetController ya expone GET /vets con content negotiation (HTML, JSON, XML). Añadir SpringDoc OpenAPI al pom.xml, anotar el controlador con @Operation y @ApiResponse, y asegurar que /v3/api-docs y swagger-ui están disponibles sin romper los endpoints HTML existentes."
+```
 
 ---
 
-## Escenario 8 — `security_review`: Revisar la seguridad del controlador de propietarios
+## Escenario 8 — `aecf_security_review`: Revisar la seguridad del controlador de propietarios
 
 **¿Por qué es interesante?**
 `OwnerController` recibe parámetros de formulario directamente en objetos de dominio. Aunque usa `@InitBinder` para bloquear el campo `id`, hay otras superficies de ataque: mass assignment de otros campos, ausencia de CSRF explícito, y una ruta `/oups` que lanza una excepción intencionada.
@@ -143,12 +157,14 @@ Claude debe añadir la dependencia de SpringDoc OpenAPI a `pom.xml`, crear un `V
 **¿Qué deberíamos ver?**
 Claude debe revisar `OwnerController`, `PetController`, `PetclinicInitializer`, identificar la ausencia de Spring Security, el `@InitBinder`, la validación con `@NotEmpty`/`@Digits`, y generar un informe con vulnerabilidades potenciales y recomendaciones priorizadas.
 
-**Prompt de partida sugerido:**
-> "Haz una revisión de seguridad de los controladores web. ¿Qué riesgos existen y cómo se mitigarían?"
+**Prompt AECF:**
+```
+@aecf run skill=aecf_security_review TOPIC=controller_security prompt="Revisar la seguridad de la capa web de PetClinic. Analizar OwnerController, PetController, VisitController y PetclinicInitializer. Superficie de ataque: binding directo de formularios a entidades de dominio, @InitBinder como única protección contra mass assignment, ausencia de Spring Security, ruta /oups expuesta, y validación con @NotEmpty/@Digits. Generar informe CVSS con recomendaciones priorizadas."
+```
 
 ---
 
-## Escenario 9 — `refactor`: Migrar configuración XML a Java Config
+## Escenario 9 — `aecf_refactor`: Migrar configuración XML a Java Config
 
 **¿Por qué es interesante?**
 Todo el wiring de beans está en XML (`business-config.xml`, etc.). Es un refactor de modernización puro: convertir a `@Configuration` classes sin cambiar el comportamiento observable. Es exactamente el tipo de tarea que una IA puede hacer de forma sistemática si entiende bien la semántica del XML.
@@ -161,12 +177,14 @@ Todo el wiring de beans está en XML (`business-config.xml`, etc.). Es un refact
 **¿Qué deberíamos ver?**
 Claude debe producir clases `@Configuration` equivalentes para cada XML, mantener los perfiles `@Profile("jpa")`, `@Profile("jdbc")` etc., y proponer cómo eliminar los XML del classpath de forma gradual y segura.
 
-**Prompt de partida sugerido:**
-> "Quiero migrar la configuración de XML a Java Config. Empieza por `business-config.xml` y asegúrate de no romper los tests."
+**Prompt AECF:**
+```
+@aecf run skill=aecf_refactor TOPIC=xml_to_java_config prompt="Migrar la configuración Spring de XML a Java Config. Empezar por business-config.xml: contiene EntityManagerFactory, TransactionManager, component-scan y tres perfiles (jpa, jdbc, spring-data-jpa). Producir clases @Configuration equivalentes conservando los @Profile, sin cambiar el comportamiento observable, y proponer una estrategia de migración gradual que no rompa los tests existentes."
+```
 
 ---
 
-## Escenario 10 — `new_feature` + `explain_behaviour`: Internacionalización y detección de locale
+## Escenario 10 — `aecf_new_feature`: Internacionalización completa con selector de locale
 
 **¿Por qué es interesante?**
 El proyecto tiene ficheros `messages_es.properties`, `messages_de.properties`, `messages_fr.properties` pero no hay ningún mecanismo en la UI para que el usuario cambie de idioma. Los mensajes de validación están parcialmente internacionalizados. Es un feature incompleto y real.
@@ -179,25 +197,27 @@ El proyecto tiene ficheros `messages_es.properties`, `messages_de.properties`, `
 **¿Qué deberíamos ver?**
 Claude debe leer `mvc-core-config.xml` para ver si hay `LocaleResolver` configurado, revisar los ficheros de mensajes para detectar gaps entre idiomas, y proponer añadir el interceptor de cambio de locale + un selector en el layout JSP.
 
-**Prompt de partida sugerido:**
-> "El proyecto tiene ficheros de mensajes en varios idiomas pero no hay forma de cambiar el idioma desde la UI. Analiza el estado actual y añade el soporte completo."
+**Prompt AECF:**
+```
+@aecf run skill=aecf_new_feature TOPIC=i18n_locale_selector prompt="El proyecto tiene ficheros de mensajes en es, de y fr (src/main/resources/messages/) pero no hay ningún mecanismo en la UI para cambiar de idioma. Analizar qué LocaleResolver y LocaleChangeInterceptor están configurados en mvc-core-config.xml, detectar gaps de cobertura entre los ficheros de mensajes, e implementar el selector de idioma completo: interceptor Spring MVC + widget en el layout JSP."
+```
 
 ---
 
 ## Resumen de cobertura de skills AECF
 
-| # | Escenario | Tipo | Complejidad | Skills AECF cubiertos |
-|---|-----------|------|-------------|----------------------|
-| 1 | 3 estrategias de persistencia | `explain_behaviour` | Media | Exploration, Architecture reasoning |
-| 2 | Paginación en owners | `new_feature` | Media | Multi-layer change, View modification |
-| 3 | Refactor EAGER loading | `refactor` | Alta | Bug analysis, Impact tracing |
-| 4 | Documentar XML config | `document_legacy` | Baja | Legacy reading, Doc generation |
-| 5 | Cobertura tests JDBC | `test_coverage` | Media | Gap analysis, Test generation |
-| 6 | AOP y punto ciego | `explain_behaviour` | Alta | Proxy internals, AOP reasoning |
-| 7 | REST + OpenAPI | `new_feature` | Media | Dependency mgmt, API design |
-| 8 | Security review | `security_review` | Media | Threat modeling, Code review |
-| 9 | XML → Java Config | `refactor` | Alta | Mechanical transformation, Verification |
-| 10 | i18n completa | `new_feature` | Media | Feature gap analysis, UI + backend |
+| # | Escenario | Skill AECF | Tier | Complejidad |
+|---|-----------|-----------|------|-------------|
+| 1 | 3 estrategias de persistencia | `aecf_explain_behaviour` | TIER1 | Media |
+| 2 | Paginación en owners | `aecf_new_feature` | TIER3 | Media |
+| 3 | Refactor EAGER loading | `aecf_refactor` | TIER3 | Alta |
+| 4 | Documentar XML config | `aecf_document_legacy` | TIER2 | Baja |
+| 5 | Cobertura tests JDBC | `aecf_new_test_set` | TIER3 | Media |
+| 6 | AOP y punto ciego | `aecf_explain_behaviour` | TIER1 | Alta |
+| 7 | REST + OpenAPI | `aecf_new_feature` | TIER3 | Media |
+| 8 | Security review | `aecf_security_review` | TIER1 | Media |
+| 9 | XML → Java Config | `aecf_refactor` | TIER3 | Alta |
+| 10 | i18n completa | `aecf_new_feature` | TIER3 | Media |
 
 ---
 
