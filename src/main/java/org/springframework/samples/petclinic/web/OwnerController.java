@@ -15,12 +15,18 @@
  */
 package org.springframework.samples.petclinic.web;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.MediaType;
 import org.springframework.samples.petclinic.model.Owner;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -114,6 +120,25 @@ public class OwnerController {
         owner.setId(ownerId);
         this.clinicService.saveOwner(owner);
         return "redirect:/owners/{ownerId}";
+    }
+
+    @GetMapping(value = "/owners/{ownerId}/visits", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<Map<String, Object>> getOwnerVisits(@PathVariable("ownerId") int ownerId) {
+        Owner owner = this.clinicService.findOwnerById(ownerId);
+        List<Map<String, Object>> visits = new ArrayList<>();
+        for (Pet pet : owner.getPets()) {
+            for (Visit visit : pet.getVisits()) {
+                Map<String, Object> entry = new LinkedHashMap<>();
+                entry.put("id", visit.getId());
+                entry.put("date", visit.getDate());
+                entry.put("description", visit.getDescription());
+                entry.put("petId", pet.getId());
+                entry.put("petName", pet.getName());
+                visits.add(entry);
+            }
+        }
+        return visits;
     }
 
     /**

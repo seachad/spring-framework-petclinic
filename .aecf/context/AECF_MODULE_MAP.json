@@ -1,0 +1,138 @@
+{
+  "web": {
+    "description": "Spring MVC controllers and web-layer utilities",
+    "path": "src/main/java/org/springframework/samples/petclinic/web/",
+    "files": [
+      "CrashController.java",
+      "OwnerController.java",
+      "PetController.java",
+      "PetTypeFormatter.java",
+      "PetValidator.java",
+      "VetController.java",
+      "VisitController.java"
+    ],
+    "role": "HTTP request handling, view routing, data binding, form validation"
+  },
+  "service": {
+    "description": "Application service layer — single facade for all clinic operations",
+    "path": "src/main/java/org/springframework/samples/petclinic/service/",
+    "files": [
+      "ClinicService.java",
+      "ClinicServiceImpl.java"
+    ],
+    "role": "Transactional business logic, caching (@Cacheable on findVets)"
+  },
+  "model": {
+    "description": "Domain entity classes with JPA/Hibernate annotations",
+    "path": "src/main/java/org/springframework/samples/petclinic/model/",
+    "files": [
+      "BaseEntity.java",
+      "NamedEntity.java",
+      "Person.java",
+      "Owner.java",
+      "Pet.java",
+      "PetType.java",
+      "Specialty.java",
+      "Vet.java",
+      "Vets.java",
+      "Visit.java"
+    ],
+    "role": "Core domain model — annotated with Bean Validation and JPA/Hibernate mappings"
+  },
+  "repository": {
+    "description": "Repository interfaces (contracts)",
+    "path": "src/main/java/org/springframework/samples/petclinic/repository/",
+    "files": [
+      "OwnerRepository.java",
+      "PetRepository.java",
+      "VetRepository.java",
+      "VisitRepository.java"
+    ],
+    "role": "Data-access contracts; 3 interchangeable implementations selected via Spring profile"
+  },
+  "repository_jdbc": {
+    "description": "JDBC implementation — active when profile=jdbc",
+    "path": "src/main/java/org/springframework/samples/petclinic/repository/jdbc/",
+    "files": [
+      "JdbcOwnerRepositoryImpl.java",
+      "JdbcPetRepositoryImpl.java",
+      "JdbcVetRepositoryImpl.java",
+      "JdbcVisitRepositoryImpl.java",
+      "JdbcPet.java",
+      "JdbcPetRowMapper.java",
+      "JdbcPetVisitExtractor.java",
+      "JdbcVisitRowMapper.java",
+      "OneToManyResultSetExtractor.java"
+    ],
+    "role": "Plain Spring JdbcClient-based data access (highest complexity, main hotspot)"
+  },
+  "repository_jpa": {
+    "description": "JPA/Hibernate implementation — active when profile=jpa (DEFAULT)",
+    "path": "src/main/java/org/springframework/samples/petclinic/repository/jpa/",
+    "files": [
+      "JpaOwnerRepositoryImpl.java",
+      "JpaPetRepositoryImpl.java",
+      "JpaVetRepositoryImpl.java",
+      "JpaVisitRepositoryImpl.java"
+    ],
+    "role": "EntityManager-based JPA data access — default runtime profile"
+  },
+  "repository_springdatajpa": {
+    "description": "Spring Data JPA implementation — active when profile=spring-data-jpa",
+    "path": "src/main/java/org/springframework/samples/petclinic/repository/springdatajpa/",
+    "files": [
+      "SpringDataOwnerRepository.java",
+      "SpringDataPetRepository.java",
+      "SpringDataVetRepository.java",
+      "SpringDataVisitRepository.java"
+    ],
+    "role": "Spring Data Repository interfaces — minimal boilerplate, query derivation"
+  },
+  "util": {
+    "description": "Cross-cutting utilities and AOP aspects",
+    "path": "src/main/java/org/springframework/samples/petclinic/util/",
+    "files": [
+      "CallMonitoringAspect.java",
+      "EntityUtils.java"
+    ],
+    "role": "AOP call monitoring (count + duration), JMX export, generic entity lookup utility"
+  },
+  "initializer": {
+    "description": "Application bootstrap",
+    "path": "src/main/java/org/springframework/samples/petclinic/",
+    "files": ["PetclinicInitializer.java"],
+    "role": "Servlet 3.0 web initializer — wires root and MVC application contexts"
+  },
+  "views": {
+    "description": "JSP view templates",
+    "path": "src/main/webapp/WEB-INF/jsp/",
+    "role": "Rendered by InternalResourceViewResolver; covers owners, pets, vets, visits, fragments"
+  },
+  "spring_config": {
+    "description": "XML-based Spring configuration",
+    "path": "src/main/resources/spring/",
+    "files": [
+      "business-config.xml",
+      "datasource-config.xml",
+      "mvc-core-config.xml",
+      "mvc-view-config.xml",
+      "tools-config.xml",
+      "data-access.properties"
+    ],
+    "role": "Bean wiring, profile switching, DataSource, MVC config, caching, AOP"
+  },
+  "db_scripts": {
+    "description": "SQL schema and seed data scripts",
+    "path": "src/main/resources/db/",
+    "role": "Per-database (h2, hsqldb, mysql, postgres) schema.sql and data.sql scripts"
+  },
+  "tests": {
+    "description": "Test suite",
+    "path": "src/test/java/",
+    "sub_modules": {
+      "model_tests": ["OwnerTests", "PetTests", "ValidatorTests", "VetTests"],
+      "service_tests": ["AbstractClinicServiceTests", "ClinicServiceJdbcTests", "ClinicServiceJpaTests", "ClinicServiceSpringDataJpaTests"],
+      "web_tests": ["CrashControllerTests", "OwnerControllerTests", "PetControllerTests", "PetTypeFormatterTests", "VetControllerTests", "VisitControllerTests"]
+    }
+  }
+}

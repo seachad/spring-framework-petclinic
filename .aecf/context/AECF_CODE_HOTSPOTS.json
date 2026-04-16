@@ -1,0 +1,69 @@
+{
+  "hotspots": [
+    {
+      "file": "src/main/java/org/springframework/samples/petclinic/repository/jdbc/JdbcOwnerRepositoryImpl.java",
+      "loc": 156,
+      "risk_level": "HIGH",
+      "reasons": [
+        "Highest LOC in the JDBC module",
+        "Manual SQL assembly with multi-table joins",
+        "loadPetsAndVisits — nested result-set mapping, imperative loop logic",
+        "Cross-cutting: touches owners, pets, visits, and pet_types tables in a single query",
+        "Profile-guarded — changes here do NOT affect the default jpa profile"
+      ],
+      "coupling": ["JdbcPetVisitExtractor", "JdbcPetRowMapper", "Owner", "Pet", "Visit", "PetType"]
+    },
+    {
+      "file": "src/main/java/org/springframework/samples/petclinic/web/OwnerController.java",
+      "loc": 157,
+      "risk_level": "HIGH",
+      "reasons": [
+        "Highest LOC in the web layer",
+        "Multi-method handler: create, find, update, show, REST visits endpoint",
+        "Modified file (git status shows M) — active churn",
+        "Contains REST JSON endpoint (getOwnerVisits) alongside JSP-backed methods"
+      ],
+      "coupling": ["ClinicService", "Owner", "Pet", "Visit"]
+    },
+    {
+      "file": "src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java",
+      "loc": 111,
+      "risk_level": "MEDIUM",
+      "reasons": [
+        "Single service class for ALL domain operations — God-service pattern",
+        "@Cacheable on findVets — cache invalidation risk if vet data changes",
+        "@Transactional at class level — all methods are transactional regardless of need",
+        "Injected by all 4 web controllers"
+      ],
+      "coupling": ["OwnerRepository", "PetRepository", "VetRepository", "VisitRepository"]
+    },
+    {
+      "file": "src/main/java/org/springframework/samples/petclinic/repository/jdbc/JdbcPetRepositoryImpl.java",
+      "loc": 117,
+      "risk_level": "MEDIUM",
+      "reasons": [
+        "Complex JDBC pet-type and pet INSERT/UPDATE logic",
+        "Manages SimpleJdbcInsert instances for two tables",
+        "Profile-guarded (jdbc only)"
+      ],
+      "coupling": ["JdbcPetRowMapper", "JdbcPetVisitExtractor", "Pet", "PetType", "Visit"]
+    },
+    {
+      "file": "src/main/java/org/springframework/samples/petclinic/repository/jdbc/OneToManyResultSetExtractor.java",
+      "loc": null,
+      "risk_level": "MEDIUM",
+      "reasons": [
+        "Generic abstract ResultSetExtractor for one-to-many JDBC result mapping",
+        "Shared across JdbcOwnerRepositoryImpl and JdbcPetRepositoryImpl",
+        "Difficult to test in isolation"
+      ],
+      "coupling": ["JdbcOwnerRepositoryImpl", "JdbcPetRepositoryImpl"]
+    }
+  ],
+  "global_risk_signals": [
+    "No TTL on Caffeine cache — vets cache never expires in the default configuration",
+    "XML-based Spring config — bean wiring errors surface at runtime, not compile time",
+    "Three interchangeable repository implementations — parity bugs are possible across profiles",
+    "OwnerController currently has an open modification (git status M) — review before merging"
+  ]
+}

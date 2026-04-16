@@ -1,0 +1,65 @@
+{
+  "core_modules": [
+    "service",
+    "web",
+    "model",
+    "repository",
+    "repository_jpa"
+  ],
+  "core_classes": [
+    "ClinicServiceImpl",
+    "ClinicService",
+    "OwnerController",
+    "PetController",
+    "VetController",
+    "VisitController",
+    "Owner",
+    "Pet",
+    "Visit",
+    "Vet",
+    "PetclinicInitializer"
+  ],
+  "core_interfaces": [
+    "ClinicService",
+    "OwnerRepository",
+    "PetRepository",
+    "VetRepository",
+    "VisitRepository"
+  ],
+  "core_functions": [
+    "ClinicServiceImpl.findOwnerById",
+    "ClinicServiceImpl.findOwnerByLastName",
+    "ClinicServiceImpl.saveOwner",
+    "ClinicServiceImpl.savePet",
+    "ClinicServiceImpl.saveVisit",
+    "ClinicServiceImpl.findVets",
+    "ClinicServiceImpl.findPetById",
+    "ClinicServiceImpl.findVisitsByPetId",
+    "OwnerController.processFindForm",
+    "OwnerController.showOwner",
+    "JdbcOwnerRepositoryImpl.loadPetsAndVisits"
+  ],
+  "entry_points": [
+    "PetclinicInitializer"
+  ],
+  "critical_files": [
+    "src/main/java/org/springframework/samples/petclinic/PetclinicInitializer.java",
+    "src/main/java/org/springframework/samples/petclinic/service/ClinicService.java",
+    "src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java",
+    "src/main/java/org/springframework/samples/petclinic/web/OwnerController.java",
+    "src/main/resources/spring/business-config.xml",
+    "src/main/resources/spring/mvc-core-config.xml",
+    "src/main/resources/spring/datasource-config.xml",
+    "src/main/resources/spring/tools-config.xml",
+    "pom.xml"
+  ],
+  "active_persistence_profile": "jpa",
+  "available_profiles": ["jdbc", "jpa", "spring-data-jpa"],
+  "cached_operations": ["ClinicServiceImpl.findVets"],
+  "transactional_boundary": "ClinicServiceImpl (class-level @Transactional)",
+  "aop_pointcut": "CallMonitoringAspect intercepts ClinicService calls",
+  "test_base_class": "AbstractClinicServiceTests",
+  "modified_files_in_working_tree": [
+    "src/main/java/org/springframework/samples/petclinic/web/OwnerController.java"
+  ]
+}

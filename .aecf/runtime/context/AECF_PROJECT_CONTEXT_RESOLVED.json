@@ -1,0 +1,162 @@
+{
+  "_resolved_note": "AUTO + HUMAN merged. HUMAN wins on conflicts. Human fields currently empty — AUTO values used as-is. Re-run 'aecf context resolve' after editing HUMAN.yaml.",
+  "context_metadata": {
+    "project_name": "spring-framework-petclinic",
+    "generated_at": "2026-04-16T00:00:00Z",
+    "context_version": "1.0.0",
+    "structural_hash": "a3f2c8d1e7b40956",
+    "confidence_overall": 0.87,
+    "generator_skill": "aecf_project_context_generator",
+    "output_language": "ENGLISH",
+    "topic": "setup_project",
+    "attribution": "fernando.garcia.varela@seachad.com",
+    "resolve_timestamp": "2026-04-16T00:00:00Z",
+    "human_override_count": 0
+  },
+  "business_context": {
+    "business_criticality": "PENDING_HUMAN_INPUT",
+    "risk_tolerance": "PENDING_HUMAN_INPUT",
+    "data_classification": "PENDING_HUMAN_INPUT",
+    "team_size": "PENDING_HUMAN_INPUT",
+    "compliance_requirements": [],
+    "deployment_environments": [],
+    "on_call_rotation": "PENDING_HUMAN_INPUT",
+    "change_management_process": "PENDING_HUMAN_INPUT"
+  },
+  "technical_stack": {
+    "confidence": 0.97,
+    "source": "auto",
+    "primary_languages": ["Java 17"],
+    "frameworks": [
+      "Spring Framework 7.0.6",
+      "Spring MVC 7.0.6",
+      "Spring Data JPA 2025.1.2",
+      "Spring ORM 7.0.6",
+      "Spring JDBC 7.0.6",
+      "AspectJ 1.9.25.1",
+      "Hibernate Validator 9.1.0.Final"
+    ],
+    "orms": ["Hibernate ORM 7.3.0.Final", "Spring Data JPA 2025.1.2"],
+    "databases": ["H2 2.4.240 (default/in-memory)", "HSQLDB 2.7.4", "MySQL 8.1.0", "PostgreSQL 42.7.9"],
+    "cache_backends": ["Caffeine 3.2.3"],
+    "message_brokers": [],
+    "cloud_services": [],
+    "tooling": {
+      "linting": ["SonarCloud"],
+      "formatting": ["EditorConfig (.editorconfig)"],
+      "testing": ["JUnit Jupiter 6.0.2", "Mockito 5.23.0", "AssertJ 3.27.7", "Hamcrest 3.0", "JMeter"],
+      "build": ["Maven 3.8.4+", "Maven Wrapper (mvnw)", "JaCoCo 0.8.14", "Jib 3.5.1", "LibSass", "Jetty 11.0.26"]
+    },
+    "runtime_versions": {
+      "java": "17",
+      "maven_min": "3.8.4",
+      "spring_framework": "7.0.6",
+      "hibernate": "7.3.0.Final"
+    }
+  },
+  "architecture_pattern": {
+    "confidence": 0.95,
+    "source": "auto",
+    "style": "modular_monolith",
+    "layers": [
+      "web (Spring MVC controllers, JSP views, formatters, validators)",
+      "service (ClinicService facade with @Transactional and @Cacheable)",
+      "repository (interchangeable JDBC / JPA / Spring Data JPA implementations)",
+      "model (JPA domain entities)",
+      "util (AOP monitoring aspect)"
+    ],
+    "api_style": "REST",
+    "auth_patterns": [],
+    "multi_tenant": false,
+    "entry_points": ["src/main/java/org/springframework/samples/petclinic/PetclinicInitializer.java"],
+    "deployment_model": "container",
+    "process_model": "single"
+  },
+  "persistence_model": {
+    "confidence": 0.97,
+    "source": "auto",
+    "primary_db": "H2 in-memory (default); MySQL and PostgreSQL supported via Maven profiles",
+    "orm_or_driver": "Hibernate ORM 7.3.0.Final (JPA), Spring JDBC, Spring Data JPA",
+    "migration_system": "SQL scripts (schema.sql + data.sql per DB flavor)",
+    "secondary_stores": []
+  },
+  "concurrency_model": {
+    "confidence": 0.75,
+    "source": "auto",
+    "threading_model": "sync",
+    "task_queues": [],
+    "lock_patterns": [],
+    "worker_processes": false
+  },
+  "caching_strategy": {
+    "confidence": 0.95,
+    "source": "auto",
+    "backends": ["Caffeine 3.2.3"],
+    "patterns": ["@Cacheable on ClinicServiceImpl.findVets()"],
+    "cache_names": ["vets", "default"],
+    "ttl_defaults": {}
+  },
+  "external_integrations": {
+    "confidence": 0.90,
+    "source": "auto",
+    "apis_consumed": [],
+    "auth_providers": [],
+    "webhooks": [],
+    "event_buses": [],
+    "third_party_services": ["SonarCloud"],
+    "jmx": "CallMonitoringAspect exported via JMX"
+  },
+  "domain_model_snapshot": {
+    "confidence": 0.97,
+    "source": "auto",
+    "core_entities": ["Owner", "Pet", "PetType", "Visit", "Vet", "Specialty", "Vets"],
+    "bounded_contexts": ["PetClinic"],
+    "aggregate_roots": ["Owner", "Vet"],
+    "relationships": [
+      "Owner 1..* Pet",
+      "Pet 1..* Visit",
+      "Pet *..1 PetType",
+      "Vet *..* Specialty"
+    ]
+  },
+  "governance_signals": {
+    "confidence": 0.92,
+    "source": "auto",
+    "test_framework": "JUnit Jupiter 6.0.2 + Spring Test",
+    "test_organization": "Mirror of main package; *Tests.java naming convention",
+    "coverage_tool": "JaCoCo 0.8.14",
+    "linting_rules": ["SonarCloud"],
+    "security_mechanisms": [],
+    "ci_cd_pipeline": "GitHub Actions (main + PR workflows); Java 17 + 21 matrix; SonarCloud gate",
+    "monitoring_observability": ["SLF4J + Logback", "CallMonitoringAspect", "JMX"]
+  },
+  "structural_metrics": {
+    "confidence": 0.88,
+    "source": "auto",
+    "total_files": 112,
+    "total_lines_estimated": 6200,
+    "module_count": 1,
+    "monolithic_files": [],
+    "complexity_hotspots": [
+      "src/main/java/org/springframework/samples/petclinic/repository/jdbc/JdbcOwnerRepositoryImpl.java",
+      "src/main/java/org/springframework/samples/petclinic/repository/jdbc/JdbcPetRepositoryImpl.java"
+    ],
+    "files_by_language": {
+      "java": 54,
+      "xml": 12,
+      "jsp": 10,
+      "sql": 8,
+      "properties": 6,
+      "scss": 4,
+      "css": 1,
+      "tag": 9,
+      "yaml": 2,
+      "other": 6
+    }
+  },
+  "context_integrity": {
+    "structural_hash": "a3f2c8d1e7b40956",
+    "structural_hash_match": true,
+    "requires_refresh": false
+  }
+}
