@@ -47,19 +47,19 @@ Claude debe proponer cambios en `OwnerRepository` (añadir `Pageable`), `ClinicS
 ## Escenario 3 — `aecf_refactor`: Eliminar el acoplamiento de EAGER loading
 
 **¿Por qué es interesante?**
-`Pet.visits` está mapeado como `FetchType.EAGER`. El propio código fuente incluye un comentario: `"There is a bug in this implementation. It would be more correct to use LAZY loading here, but EAGER is used to avoid [LazyInitializationException]"`. Es un caso clásico de deuda técnica documentada.
+`Pet.visits` está mapeado como `FetchType.EAGER` en `src/main/java/org/springframework/samples/petclinic/model/Pet.java`. Esa elección acopla el modelo a una estrategia de carga concreta y oculta si realmente se necesita materializar `visits` en todos los recorridos. Además, el código ya ofrece una vía alternativa para cargar visitas por separado en `ClinicServiceImpl.findVisitsByPetId(int)`, lo que hace verificable que existe margen para desacoplar esa relación.
 
 **¿Qué demuestra?**
-- Refactor guiado por evidencia: Claude debe leer el comentario existente, entender las implicaciones y proponer la solución correcta (sesión transaccional abierta o DTOs)
+- Refactor guiado por evidencia: Claude debe partir del mapeo real en `Pet.java` y de los puntos de acceso a `pet.getVisits()` para justificar si conviene pasar a `LAZY`
 - Razonamiento sobre side effects: cambiar EAGER a LAZY puede romper otros puntos de carga
 - Búsqueda de todos los puntos de uso antes de modificar
 
 **¿Qué deberíamos ver?**
-Claude debe encontrar el `@OneToMany(fetch = FetchType.EAGER)` en `Pet.java`, rastrear todos los puntos donde se accede a `pet.getVisits()` fuera de contexto transaccional, y proponer la solución (inicializar dentro de una transacción activa o usar `@Transactional` correctamente en el servicio).
+Claude debe encontrar el `@OneToMany(fetch = FetchType.EAGER)` en `Pet.java`, rastrear todos los puntos donde se accede a `pet.getVisits()` fuera de contexto transaccional, identificar si esos accesos pueden sustituirse por carga explícita desde servicio o por una frontera transaccional correcta, y proponer el refactor sin introducir `LazyInitializationException`.
 
 **Prompt AECF:**
 ```
-@aecf run skill=aecf_refactor TOPIC=eager_loading_fix prompt="El modelo Pet tiene una relación OneToMany con Visit mapeada como FetchType.EAGER. El propio código incluye un comentario de deuda técnica indicando que debería ser LAZY. Analizar todos los puntos de acceso a pet.getVisits(), trazar el impacto de cambiar a LAZY y proponer el refactor correcto sin introducir LazyInitializationException."
+@aecf run skill=aecf_refactor TOPIC=eager_loading_fix prompt="El modelo Pet tiene una relación OneToMany con Visit mapeada como FetchType.EAGER en Pet.java. Analizar todos los puntos de acceso a pet.getVisits(), comparar ese acoplamiento con la carga explícita de visitas disponible en ClinicServiceImpl.findVisitsByPetId(int), trazar el impacto de cambiar a LAZY y proponer el refactor correcto sin introducir LazyInitializationException."
 ```
 
 ---
@@ -67,7 +67,7 @@ Claude debe encontrar el `@OneToMany(fetch = FetchType.EAGER)` en `Pet.java`, ra
 ## Escenario 4 — `aecf_document_legacy`: Documentar la configuración XML
 
 **¿Por qué es interesante?**
-`business-config.xml`, `mvc-core-config.xml`, `datasource-config.xml` y `tools-config.xml` son configuración Spring estilo pre-Boot. Para un desarrollador moderno que solo conoce `@SpringBootApplication` y `application.yml`, este XML es opaco.
+`business-config.xml`, `mvc-core-config.xml`, `mvc-view-config.xml`, `datasource-config.xml` y `tools-config.xml` son configuración Spring estilo pre-Boot. Para un desarrollador moderno que solo conoce `@SpringBootApplication` y `application.yml`, este XML es opaco.
 
 **¿Qué demuestra?**
 - La capacidad de Claude para leer XML de configuración Spring (namespaces, beans, imports, perfiles)
@@ -75,11 +75,11 @@ Claude debe encontrar el `@OneToMany(fetch = FetchType.EAGER)` en `Pet.java`, ra
 - Traducción entre paradigmas (XML vs. Java Config vs. Boot autoconfiguration)
 
 **¿Qué deberíamos ver?**
-Claude debe producir un documento que explique qué hace cada archivo XML, qué beans registra, cómo se relacionan entre sí, y —opcionalmente— su equivalente en Spring Boot si se quisiera migrar.
+Claude debe producir un documento que explique qué hace cada archivo XML, qué beans registra, cómo se relacionan entre sí, y —opcionalmente— su equivalente en Spring Boot si se quisiera migrar. Conviene incluir `mvc-view-config.xml` junto con `mvc-core-config.xml`, porque ahí vive la resolución de vistas y la negociación de contenido de la capa MVC.
 
 **Prompt AECF:**
 ```
-@aecf run skill=aecf_document_legacy TOPIC=spring_xml_config prompt="Documentar los cuatro archivos de configuración XML en src/main/resources/spring/ (business-config.xml, mvc-core-config.xml, datasource-config.xml, tools-config.xml). Para cada uno: qué beans registra, cómo se relaciona con los demás, qué perfiles Spring activa, y su equivalente conceptual en Spring Boot."
+@aecf run skill=aecf_document_legacy TOPIC=spring_xml_config prompt="Documentar los cinco archivos de configuración XML en src/main/resources/spring/ (business-config.xml, mvc-core-config.xml, mvc-view-config.xml, datasource-config.xml, tools-config.xml). Para cada uno: qué beans registra, cómo se relaciona con los demás, qué perfiles Spring activa, y su equivalente conceptual en Spring Boot. Explicar además por qué mvc-core-config.xml y mvc-view-config.xml están separados dentro de la configuración MVC."
 ```
 
 ---
@@ -112,14 +112,14 @@ Claude debe leer `JdbcOwnerRepositoryImpl`, identificar lógica específica no c
 **¿Qué demuestra?**
 - Razonamiento sobre AOP, proxies dinámicos y la jerarquía de proxies de Spring
 - Capacidad de Claude para leer el comentario de advertencia, reproducir el problema conceptualmente y explicar por qué ocurre
-- Proponer una solución (ej: AspectJ weaving, cambiar el pointcut, usar Spring Data listeners)
+- Proponer una solución (ej: AspectJ weaving, cambiar la estrategia de selección del advice, usar mecanismos específicos de Spring Data)
 
 **¿Qué deberíamos ver?**
-Claude debe leer `CallMonitoringAspect.java`, explicar el mecanismo de proxy de Spring Data JPA, y describir por qué el pointcut `within(org.springframework.samples.petclinic.repository..*)` no captura los beans generados dinámicamente.
+Claude debe leer `CallMonitoringAspect.java`, explicar el mecanismo de proxy de Spring Data JPA, y describir por qué el pointcut real `within(@org.springframework.stereotype.Repository *)` deja fuera a los proxies generados para los repositorios de Spring Data JPA, aunque sí funciona con las implementaciones JPA y JDBC anotadas directamente.
 
 **Prompt AECF:**
 ```
-@aecf run skill=aecf_explain_behaviour TOPIC=aop_monitoring_aspect prompt="CallMonitoringAspect usa AOP para monitorizar repositorios pero no funciona con Spring Data JPA. Explicar por qué el pointcut within(org.springframework.samples.petclinic.repository..*) no intercepta los repositorios de Spring Data JPA, qué mecanismo de proxy los diferencia de los repositorios JPA y JDBC, y qué opciones existen para solucionar el punto ciego."
+@aecf run skill=aecf_explain_behaviour TOPIC=aop_monitoring_aspect prompt="CallMonitoringAspect usa AOP para monitorizar repositorios pero no funciona con Spring Data JPA. Explicar por qué el pointcut real within(@org.springframework.stereotype.Repository *) selecciona las clases concretas anotadas con @Repository pero deja fuera a los proxies de interfaz generados por Spring Data JPA, qué mecanismo de proxy los diferencia de los repositorios JPA y JDBC del proyecto, y qué opciones existen para solucionar ese punto ciego."
 ```
 
 ---
@@ -127,19 +127,19 @@ Claude debe leer `CallMonitoringAspect.java`, explicar el mecanismo de proxy de 
 ## Escenario 7 — `aecf_new_feature`: Endpoint REST para vets con OpenAPI
 
 **¿Por qué es interesante?**
-`VetController` ya devuelve JSON y XML via content negotiation sobre `GET /vets`. Es un punto de partida para añadir una API REST completa documentada con OpenAPI/Swagger. La feature es concreta, acotada y demuestra bien el razonamiento sobre capas.
+`VetController` ya expone una vista HTML en `GET /vets` y dos endpoints serializados separados en `GET /vets.json` y `GET /vets.xml`. Eso obliga a razonar sobre si conviene documentar la API tal como existe hoy o consolidarla primero hacia un endpoint REST único con `produces` según `Accept`. La feature es concreta, acotada y demuestra bien el razonamiento sobre capas.
 
 **¿Qué demuestra?**
 - Cómo Claude amplía un endpoint existente sin romper el comportamiento HTML
 - Añadir dependencias Maven, configurar SpringDoc/OpenAPI, y anotar el controlador
-- Que Claude distingue entre content negotiation para HTML y una API REST dedicada
+- Que Claude distingue entre rutas HTML existentes y endpoints serializados dedicados, o decide refactorizarlos explícitamente hacia una API REST más coherente
 
 **¿Qué deberíamos ver?**
-Claude debe añadir la dependencia de SpringDoc OpenAPI a `pom.xml`, crear un `VetRestController` (o enriquecer el existente), añadir anotaciones `@Operation`/`@ApiResponse`, y verificar que el endpoint `/v3/api-docs` funciona.
+Claude debe partir de los mappings reales de `VetController` (`/vets`, `/vets.json`, `/vets.xml`), decidir explícitamente una de estas dos rutas: documentar la API con esos paths tal como existen hoy, o introducir primero una consolidación hacia un endpoint REST con `produces` según `Accept` sin romper la vista HTML. Después debe añadir la dependencia de SpringDoc OpenAPI a `pom.xml`, crear un `VetRestController` (o refactorizar explícitamente los endpoints serializados existentes), añadir anotaciones `@Operation`/`@ApiResponse`, y verificar que el endpoint `/v3/api-docs` funciona.
 
 **Prompt AECF:**
 ```
-@aecf run skill=aecf_new_feature TOPIC=vet_rest_api prompt="Añadir documentación OpenAPI al endpoint de veterinarios. VetController ya expone GET /vets con content negotiation (HTML, JSON, XML). Añadir SpringDoc OpenAPI al pom.xml, anotar el controlador con @Operation y @ApiResponse, y asegurar que /v3/api-docs y swagger-ui están disponibles sin romper los endpoints HTML existentes."
+@aecf run skill=aecf_new_feature TOPIC=vet_rest_api prompt="Añadir documentación OpenAPI al área de veterinarios partiendo de los paths reales del repo. VetController hoy expone la vista HTML en GET /vets y los formatos serializados en GET /vets.json y GET /vets.xml; no asumir que ya existe negociación por Accept en /vets. Decide explícitamente si conviene documentar esos endpoints tal como están o hacer primero una consolidación hacia un endpoint REST único con produces según Accept sin romper la vista HTML. Después añade SpringDoc OpenAPI al pom.xml, anota el controlador o extrae un VetRestController con @Operation y @ApiResponse, y asegura que /v3/api-docs y swagger-ui están disponibles."
 ```
 
 ---
@@ -187,7 +187,7 @@ Claude debe producir clases `@Configuration` equivalentes para cada XML, mantene
 ## Escenario 10 — `aecf_new_feature`: Internacionalización completa con selector de locale
 
 **¿Por qué es interesante?**
-El proyecto tiene ficheros `messages_es.properties`, `messages_de.properties`, `messages_fr.properties` pero no hay ningún mecanismo en la UI para que el usuario cambie de idioma. Los mensajes de validación están parcialmente internacionalizados. Es un feature incompleto y real.
+El proyecto tiene bundles de mensajes `messages.properties`, `messages_en.properties`, `messages_es.properties` y `messages_de.properties`, pero no hay ningún mecanismo en la UI para que el usuario cambie de idioma. Los mensajes de validación están parcialmente internacionalizados. Es un feature incompleto y real.
 
 **¿Qué demuestra?**
 - Análisis de una feature a medio implementar: Claude debe descubrir el estado actual antes de proponer qué falta
@@ -199,7 +199,7 @@ Claude debe leer `mvc-core-config.xml` para ver si hay `LocaleResolver` configur
 
 **Prompt AECF:**
 ```
-@aecf run skill=aecf_new_feature TOPIC=i18n_locale_selector prompt="El proyecto tiene ficheros de mensajes en es, de y fr (src/main/resources/messages/) pero no hay ningún mecanismo en la UI para cambiar de idioma. Analizar qué LocaleResolver y LocaleChangeInterceptor están configurados en mvc-core-config.xml, detectar gaps de cobertura entre los ficheros de mensajes, e implementar el selector de idioma completo: interceptor Spring MVC + widget en el layout JSP."
+@aecf run skill=aecf_new_feature TOPIC=i18n_locale_selector prompt="El proyecto tiene bundles de mensajes en src/main/resources/messages/ (`messages.properties`, `messages_en.properties`, `messages_es.properties`, `messages_de.properties`) pero no hay ningún mecanismo en la UI para cambiar de idioma. Analizar qué LocaleResolver y LocaleChangeInterceptor están configurados en mvc-core-config.xml, detectar gaps de cobertura entre los ficheros de mensajes, e implementar el selector de idioma completo: interceptor Spring MVC + widget en el layout JSP."
 ```
 
 ---
