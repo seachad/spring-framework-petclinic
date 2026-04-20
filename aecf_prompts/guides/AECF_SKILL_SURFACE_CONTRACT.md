@@ -1,13 +1,16 @@
 # AECF Skill Surface Contract
 
-LAST_REVIEW: 2026-04-06
+LAST_REVIEW: 2026-04-17
 OWNER SEACHAD
 
 ---
 
 ## 1. Objetivo
 
-Definir el contrato comun para los skills de `aecf_prompts` que consumen `surfaces` en ejecuciones reales.
+Definir la convencion comun para los skills de `aecf_prompts` que quieran documentar o consumir `surfaces`.
+
+Estado actual: este documento describe una convencion operativa y un objetivo de integracion futura. El
+engine y la extension no aplican hoy este contrato de forma automatica en runtime.
 
 Este contrato no decide `surfaces` nuevas.
 
@@ -36,7 +39,8 @@ Ejemplos comunes:
 
 ## 3. Parametros canonicos de superficie
 
-Cuando el usuario quiera fijar el alcance de forma explicita, los skills deben aceptar estas formas conceptuales:
+Cuando el usuario quiera fijar el alcance de forma explicita, los skills y operadores pueden adoptar estas
+formas conceptuales:
 
 1. `surface=<surface_id>`
 2. `surfaces=<surface_a,surface_b,...>`

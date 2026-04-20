@@ -9,6 +9,8 @@ OWNER SEACHAD
 
 Si estas leyendo la documentacion publicada en GitHub Pages, empieza por `index.html` en la raiz del repo y usa `GUIDE_VIEWER.html` para abrir esta guia y el resto de markdown sin salir de la superficie HTML.
 
+Si trabajas en un workspace destino con el MCP prompt-only activo, puedes pedir esta misma guía con `aecf_show_guide` para que el host la renderice en el `output_language` efectivo y use traducción derivada solo cuando no exista copia humana localizada.
+
 Si solo quieres saber por donde arrancar con `aecf_prompts`, sigue este orden:
 
 1. Lee [AECF_GUIDES_MASTER.md](AECF_GUIDES_MASTER.md)
@@ -33,9 +35,9 @@ Si solo quieres saber por donde arrancar con `aecf_prompts`, sigue este orden:
 ## Orden minimo recomendado
 
 1. Copia `aecf_prompts/` al proyecto.
-2. Define la atribución del topic con `AECF_PROMPTS_USER_ID` o, si no existe, con `AECF_PROMPTS_MODEL_ID`/`MODEL_ID` o `AECF_PROMPTS_AGENT_ID`/`AGENT_ID`. Si el host da dudas, valida lo que ve el bundle con `aecf_prompts\scripts\bootstrap_prompt_only_bundle.exe --diagnose-env`
+2. Define la atribución del topic con `AECF_PROMPTS_USER_ID` o, si no existe, con `AECF_PROMPTS_MODEL_ID`/`MODEL_ID` o `AECF_PROMPTS_AGENT_ID`/`AGENT_ID`. Si ninguna variable está disponible, el sistema genera automáticamente un ID aleatorio con prefijo `user_`. Si el host da dudas, valida lo que ve el bundle con `aecf_prompts\scripts\bootstrap_prompt_only_bundle.exe --diagnose-env`
 3. Prepara contexto:
-   - rapido: crear `.aecf/runtime/documentation/AECF_PROJECT_CONTEXT.md`
+   - rapido: crear `.aecf/documentation/AECF_PROJECT_CONTEXT.md`
    - mejor: ejecutar `aecf_project_context_generator`
 4. Si el repo es grande o complejo, ejecuta `aecf_codebase_intelligence`.
 5. Si el repo es grande o multi-equipo, crea `surfaces` con apoyo de [AECF_SURFACE_CONTEXT_MODEL.md](AECF_SURFACE_CONTEXT_MODEL.md).

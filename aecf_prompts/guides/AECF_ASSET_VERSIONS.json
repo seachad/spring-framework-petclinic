@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "generatedAtUtc": "2026-04-15T15:52:03.309Z",
+  "generatedAtUtc": "2026-04-16T22:03:14.015Z",
   "skills": {
     "sourceRoot": "aecf_prompts/skills",
-    "count": 37,
-    "collectionVersionStamp": "sha256-55a31f4a14df",
+    "count": 38,
+    "collectionVersionStamp": "sha256-140788201ee2",
     "items": [
       {
         "id": "aecf_ai_risk_assessment",
@@ -30,9 +30,9 @@
       {
         "id": "aecf_codebase_intelligence",
         "sourcePath": "aecf_prompts/skills/skill_codebase_intelligence.md",
-        "bytes": 13101,
-        "sha256": "3c74fc2ea4cdeba102fc38238d5540e7222a516f2a53b70f728abbdb7e336f6b",
-        "versionStamp": "sha256-3c74fc2ea4cd"
+        "bytes": 13923,
+        "sha256": "1f38d082030f4bd19a606157528c2f8e8cba617ef1835e7145329e68d32921d4",
+        "versionStamp": "sha256-1f38d082030f"
       },
       {
         "id": "aecf_content_project_generation_map",
@@ -184,9 +184,9 @@
       {
         "id": "aecf_project_context_generator",
         "sourcePath": "aecf_prompts/skills/skill_project_context_generator.md",
-        "bytes": 25231,
-        "sha256": "31353d85e83120c2ecd0cd92544b6ff6f7f8e40e2be4a2ae3f30fad3a231129a",
-        "versionStamp": "sha256-31353d85e831"
+        "bytes": 26506,
+        "sha256": "0dff5466be5aa5e81bec928e6a0c108eb5726a6b5ea44d04c7d59035be440270",
+        "versionStamp": "sha256-0dff5466be5a"
       },
       {
         "id": "aecf_project_context_generator_map",
@@ -208,6 +208,13 @@
         "bytes": 14253,
         "sha256": "c04bdc75f89da330f9b4346182aeec47c83e6ab6cbf7e924dd7b3cd3bd9631b6",
         "versionStamp": "sha256-c04bdc75f89d"
+      },
+      {
+        "id": "aecf_surface_discovery",
+        "sourcePath": "aecf_prompts/skills/skill_surface_discovery.md",
+        "bytes": 0,
+        "sha256": "pending",
+        "versionStamp": "sha256-pending"
       },
       {
         "id": "aecf_resolve_linting",
@@ -270,7 +277,7 @@
   "promptAssets": {
     "sourceRoot": "aecf_prompts/prompts",
     "count": 25,
-    "collectionVersionStamp": "sha256-134331adc7d9",
+    "collectionVersionStamp": "sha256-427ad8d73d31",
     "items": [
       {
         "id": "00_DEBUG",
@@ -372,9 +379,9 @@
         "id": "05_IMPLEMENT",
         "phase": "IMPLEMENT",
         "sourcePath": "aecf_prompts/prompts/05_IMPLEMENT.md",
-        "bytes": 5923,
-        "sha256": "079537f0cebcb1b27f019915fbf03a23f49998642f957a91e37bc6ed3904b01d",
-        "versionStamp": "sha256-079537f0cebc"
+        "bytes": 8166,
+        "sha256": "39fcc939b40bb372ca8fe9a1a7a7b1bbcec3450d53c8c7e19a66ee4b5ff5023e",
+        "versionStamp": "sha256-39fcc939b40b"
       },
       {
         "id": "05A_AUDIT_STATIC_ANALYSIS",
@@ -388,9 +395,9 @@
         "id": "06_AUDIT_CODE",
         "phase": "AUDIT_CODE",
         "sourcePath": "aecf_prompts/prompts/06_AUDIT_CODE.md",
-        "bytes": 6827,
-        "sha256": "a78c2da166330b7e4e9cf3b91ae31d048fef74f0dcc6d9a1bc68bcf7d956bd8f",
-        "versionStamp": "sha256-a78c2da16633"
+        "bytes": 7561,
+        "sha256": "8b693ad15705751ef5d3471c90d53f358835f6062edf0a3849bbf22d0f877220",
+        "versionStamp": "sha256-8b693ad15705"
       },
       {
         "id": "06_FIX_CODE",

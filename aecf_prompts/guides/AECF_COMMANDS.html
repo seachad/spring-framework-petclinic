@@ -361,6 +361,7 @@ Mapeo MCP preferido:
 | `@aecf list prompts` | `aecf_list_prompts` | Leer `aecf_prompts/prompts/` |
 | `@aecf list topics` | `aecf_list_topics` | Inventario prompt-only |
 | `@aecf show prompt=<name>` | `aecf_show_prompt` | Cargar el prompt manualmente |
+| `@aecf show guide=<name>` | `aecf_show_guide` | Cargar la guía localizada o devolver traducción derivada |
 | `@aecf context` / `@aecf context examine` | `aecf_context_examine` | Leer `AECF_PROJECT_CONTEXT.md` y surfaces |
 | `@aecf find skills prompt=...` | `aecf_find_skills` | Resolver skills por intención |
 | `@aecf status [topic=...]` | `aecf_status` | `status.py` o inferencia manual |
@@ -381,6 +382,7 @@ Mapeo MCP preferido:
 | `@aecf list skills` | Leer `aecf_prompts/skills/` | Soportado | Listar skills publicados y su uso recomendado |
 | `@aecf list prompts` | Leer `aecf_prompts/prompts/` | Soportado | Listar prompts de fase disponibles |
 | `@aecf show prompt=<name>` | Mostrar/sintetizar prompt | Soportado | Cargar el prompt indicado y explicarlo o reproducirlo |
+| `@aecf show guide=<name>` | Mostrar guía localizada | Soportado | Preferir `aecf_show_guide`; si no existe, leer `aecf_prompts/guides/` y aplicar localización/traducción derivada |
 | `@aecf show commands` | Alias de `list commands` | Soportado | Igual que `list commands` |
 | `@aecf show workspace_statistics` | Estadísticas del workspace por helper o inspección manual | Soportado | Preferir `python aecf_prompts/scripts/workspace_statistics.py`; si el host no ejecuta herramientas, reproducir el contrato leyendo el workspace y las exclusiones CI |
 | `@aecf find skills prompt=...` | Resolver skill por intención | Soportado | Recomendar uno o varios skills con justificación breve |

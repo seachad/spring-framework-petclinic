@@ -1,13 +1,13 @@
 # AECF Prompts
 
-LAST_REVIEW: 2026-04-15
+LAST_REVIEW: 2026-04-16
 OWNER SEACHAD
 
 ---
 
 `aecf_prompts/` es la version prompt-only de AECF para trabajar dentro del repositorio del cliente sin instalar el componente automatizado. El bundle aporta metodologia, skills, prompts, templates, checklists y scoring para ejecutar flujos manuales con el LLM que el equipo ya use.
 
-En este repositorio, `aecf_prompts/` es tambien la superficie fuente completa para prompts, skills y activos prompt-only. El bundle cliente no tiene por qué incluir todo: el task de empaquetado filtra los skills distribuibles segun `aecf_prompts/skills/SKILL_RELEASE.json` y el `bundle-mode` seleccionado.
+En este repositorio, `aecf_prompts/` es tambien la superficie fuente completa para prompts, skills y activos prompt-only. El bundle cliente no tiene por qué incluir todo: el task de empaquetado filtra los skills distribuibles segun `aecf_prompts/skills/SKILL_RELEASE.json`, la politica del cliente en `aecf_prompts_release_data/<client>.json` y el `bundle-mode` seleccionado. En `release` solo se entregan los skills `released` autorizados para ese cliente y solo los knowledge domains permitidos; en `god` se entrega toda la superficie publicada del bundle.
 
 Este README debe leerse como una guia de implantacion rapida para usuario final: que copiar, que preparar en el repo y como arrancar el primer flujo.
 
@@ -16,6 +16,8 @@ La version inglesa equivalente esta en `README_EN.md`.
 Si quieres extender un skill base con criterios o conocimiento especifico del proyecto sin meter nada en AECF base, usa la guia [guides/AECF_EXTERNAL_SKILLS.md](guides/AECF_EXTERNAL_SKILLS.md).
 
 Para consulta rapida, abre [../index.html](../index.html). Esa portada publica en la raiz del repo enlaza a [../guias/SKILL_CATALOG.html](../guias/SKILL_CATALOG.html) para skills, [../guias/AECF_COMMANDS.html](../guias/AECF_COMMANDS.html) para comandos prompt-only y [../guias/GUIDE_VIEWER.html?doc=START_HERE.md](../guias/GUIDE_VIEWER.html?doc=START_HERE.md) para el resto de guias markdown sin exponer enlaces descargables del repo. Las dos guias interactivas siguen leyendo sus `.md` canonicos desde `aecf_prompts/guides/`, asi que cualquier cambio en esos markdown queda reflejado automaticamente sin reconstruir el HTML publicado.
+
+En workspace destino con MCP prompt-only, el tool `aecf_show_guide` puede servir guias en el `output_language` efectivo. Si no existe copia humana localizada para ese idioma, el host LLM debe renderizar una traduccion derivada preservando rutas, comandos, ids AECF y bloques de codigo.
 
 La misma portada y el catálogo de skills exponen ahora los stamps de versionado generados desde [guides/AECF_ASSET_VERSIONS.md](guides/AECF_ASSET_VERSIONS.md) y `AECF_ASSET_VERSIONS.json`. Cada stamp se deriva del contenido del markdown canónico, por lo que cualquier modificación en un skill o prompt cambia el valor mostrado en documentación y HTML en el siguiente sync.
 
@@ -215,7 +217,7 @@ Esas guias se entregan en la raiz del bundle, junto a `README.md` y `README_EN.m
 
 El registro exacto depende del host empaquetado:
 
-- `claude`: usa la guia `QUICK_START_ES.md` para registrar `aecf_prompts\mcp\claude\aecf-mcp.exe` en `.mcp.json`.
+- `claude`: usa la guia `QUICK_START_ES.md` para registrar `aecf_prompts\mcp\claude\aecf-mcp.exe` en `.mcp.json`. Ademas, si Claude Desktop esta instalado en la maquina, el bootstrap registra automaticamente el mismo binario en `claude_desktop_config.json` (`%APPDATA%\Claude` en Windows, `~/Library/Application Support/Claude` en macOS).
 - `copilot`: usa la misma guia para registrar `aecf_prompts\mcp\copilot\aecf-mcp.exe` en `.vscode/mcp.json`.
 - `codex`: usa la misma guia para registrar `aecf_prompts\mcp\codex\aecf-mcp.exe` en la configuracion MCP de Codex.
 
@@ -247,7 +249,7 @@ Cuando el host tenga este MCP registrado, los comandos `@aecf` con tool equivale
 Debes tener este archivo:
 
 ```text
-.aecf/runtime/documentation/AECF_PROJECT_CONTEXT.md
+.aecf/documentation/AECF_PROJECT_CONTEXT.md
 ```
 
 Si aun no existe, crea una primera version minima o sigue la guia [guides/AECF_PROJECT_CONTEXT_BOOTSTRAP.md](guides/AECF_PROJECT_CONTEXT_BOOTSTRAP.md).
@@ -272,23 +274,23 @@ Ese paso crea el contexto de corrida del topic y fija:
 Si el trabajo va a depender del repositorio, conviene asegurar antes dos capas adicionales:
 
 1. `aecf_project_context_generator` para refrescar `AECF_PROJECT_CONTEXT.md`;
-2. `aecf_codebase_intelligence` para materializar `.aecf/context/*`.
+2. `aecf_codebase_intelligence` para materializar `documentation/context/*`.
 
-En el bundle prompt-only, esos artefactos de `.aecf/context/*` no deben copiarse completos en cada fase por defecto. Se reutilizan para derivar contexto filtrado por `TOPIC` y, en skills search-first, para congelar un `WORKING_CONTEXT` acotado a esa ejecucion.
+En el bundle prompt-only, esos artefactos de `documentation/context/*` no deben copiarse completos en cada fase por defecto. Se reutilizan para derivar contexto filtrado por `TOPIC` y, en skills search-first, para congelar un `WORKING_CONTEXT` acotado a esa ejecucion.
 
 Por defecto, las salidas viven en:
 
 ```text
-<workspace>/.aecf/runtime/documentation
+<workspace>/.aecf/documentation
 ```
 
 Patron canónico completo de artefactos por fase:
 
 ```text
-.aecf/runtime/documentation/<user_id>/<TOPIC>/<NN>_<skill_name>_<ARTEFACT_NAME>.md
+.aecf/documentation/<user_id>/<TOPIC>/<NN>_<skill_name>_<ARTEFACT_NAME>.md
 ```
 
-Si necesitas otra ubicacion, usa `AECF_PROMPTS_DOCUMENTATION_PATH`. Si en un entorno heredado ya existe `AECF_PROMPTS_DIRECTORY_PATH`, el bundle tambien lo acepta como alias legado.
+Si necesitas otra ubicacion, usa `@aecf settings set artifacts_path=<ruta>` (siempre relativa a `.aecf/`). Como fallback legacy, también se aceptan `AECF_PROMPTS_DOCUMENTATION_PATH` o `AECF_PROMPTS_DIRECTORY_PATH`.
 
 ## Como trabaja el bundle
 

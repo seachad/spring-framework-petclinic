@@ -1,5 +1,7 @@
 # AECF — AUDIT_CODE: {{TOPIC}}
 
+LAST_REVIEW: 2026-04-17
+
 ## METADATA
 
 | Field | Value |
@@ -49,6 +51,7 @@
 
 | Aspect | Status |
 | --- | --- |
+| Evidence source (`## 6. Tests Executed`) | ✅ / ❌ |
 | Tests executed | ✅ / ❌ |
 | Evidence (output) | ✅ / ❌ |
 | Tests passing | ✅ / ❌ |
@@ -62,21 +65,22 @@
 
 ## AECF_SCORE_REPORT
 
-| Category | Weight | Score | Weighted |
-| --- | --- | --- | --- |
-| Scope Validation | 2 | /6 | |
-| Security Controls | 3 | /8 | |
-| Resource Management | 2 | /4 | |
-| Dep. Outage Resilience | 3 | /10 | |
-| Logging & Observability | 2 | /6 | |
-| Compliance w/ Previous | 3 | /6 | |
-| Production Readiness | 2 | /8 | |
-| Decision Integrity | 3 | /4 | |
-| Code Audit Integrity | 2 | /6 | |
-| Testing Evidence | 3 | /6 | |
-| **TOTAL** | | | **__ / 156** |
+| Category | Weight | Raw Score | Max Raw | Weighted | Max Weighted |
+| --- | --- | --- | --- | --- | --- |
+| Scope Validation | 2 | __ | 6 | __ | 12 |
+| Security Controls | 3 | __ | 8 | __ | 24 |
+| Resource Management | 2 | __ | 4 | __ | 8 |
+| Dep. Outage Resilience | 3 | __ / N/A | 10 | __ / N/A | 30 / N/A |
+| Logging & Observability | 2 | __ | 6 | __ | 12 |
+| Compliance with Previous Phase | 3 | __ | 6 | __ | 18 |
+| Production Readiness | 2 | __ | 8 | __ | 16 |
+| Decision Integrity | 3 | __ | 4 | __ | 12 |
+| Code Audit Integrity | 2 | __ | 6 | __ | 12 |
+| Testing Evidence | 3 | __ | 6 | __ | 18 |
+| Anti-patterns | 3 | __ | 26 | __ | 78 |
+| **TOTAL** | | **__** | **__** | **__** | **__** |
 
-**Score**: ___% | **Level**: ___ | **Verdict**: GO / NO-GO
+**Raw Score**: __ / __ | **Normalized Score**: ___% | **Level**: ___ | **Verdict**: GO / NO-GO
 
 ## AECF_COMPLIANCE_REPORT
 

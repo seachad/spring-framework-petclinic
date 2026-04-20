@@ -1,5 +1,7 @@
 # AECF Prompts — AUDIT CODE
 
+LAST_REVIEW: 2026-04-17
+
 > Versión simplificada del prompt AUDIT_CODE de AECF.
 > Uso: Ejecutar después de IMPLEMENT.
 
@@ -84,11 +86,15 @@ Si el `security_review` no es obligatorio, `AUDIT_CODE` mantiene la revisión b�
 | 12 | Documentación de código (docstrings) | Medio |
 | 13 | Complejidad controlada | Medio |
 | 14 | Sin código duplicado innecesario | Bajo |
+| 15 | **Anti-patterns de scope** ausentes (`SCOPE_CREEP`, `DEAD_FEATURE`) | **CRÍTICO** |
+| 16 | **Anti-patterns de seguridad** ausentes (`HARDCODED_SECRET`, `SQL_INJECTION`, `COMMAND_INJECTION`, `INSECURE_DESERIALIZATION`, `PATH_TRAVERSAL`) | **CRÍTICO** |
+| 17 | Anti-patterns de mantenibilidad controlados (`GOD_FUNCTION`, `MAGIC_NUMBER`, `DEEP_NESTING`, `SILENT_EXCEPTION`, `GLOBAL_MUTABLE_STATE`, `PRINT_DEBUGGING`) | Medio |
 
 ## REGLA CRÍTICA
 
 > **Si NO existe la sección "Tests Executed" con evidencia REAL de ejecución → veredicto es automáticamente NO-GO**, independientemente de la calidad del código.
 > **Si la política de escalado exige `aecf_security_review` y no hay evidencia del artefacto `SECURITY_AUDIT` → veredicto es automáticamente NO-GO**, independientemente del score restante.
+> **Si se detecta cualquier anti-pattern de seguridad o scope (`HARDCODED_SECRET`, `SQL_INJECTION`, `COMMAND_INJECTION`, `INSECURE_DESERIALIZATION`, `PATH_TRAVERSAL`, `SCOPE_CREEP`, `DEAD_FEATURE`) → veredicto es automáticamente NO-GO**, clasificar como CRITICAL.
 
 ## CLASIFICACIÓN DE HALLAZGOS
 
@@ -101,6 +107,12 @@ Si el `security_review` no es obligatorio, `AUDIT_CODE` mantiene la revisión b�
 ## SCORING
 
 Aplicar el checklist **ya cargado** (`AUDIT_CODE_CHECKLIST.md`) y calcular según el modelo **ya cargado** (`SCORING_MODEL.md`).
+
+La tabla `AECF_SCORE_REPORT` DEBE reflejar exactamente las categorías puntuadas en `AUDIT_CODE_CHECKLIST.md`.
+
+- Si `Dependency Outage Resilience` no aplica porque el cambio no toca dependencias externas, marcar `N/A` y excluir esa categoría del máximo ponderado final.
+- No sustituir `Compliance with Previous Phase` por variantes abreviadas o semánticamente distintas.
+- La fila `Anti-patterns` es obligatoria y debe incluir el total agregado de los 13 checks definidos en el checklist.
 
 ## TEMPLATE DE SALIDA
 
@@ -135,7 +147,10 @@ Aplicar el checklist **ya cargado** (`AUDIT_CODE_CHECKLIST.md`) y calcular segú
 <!-- ¿El código implementa lo planificado? ¿Hay desviaciones? -->
 
 ## 3. Evaluación de testing
+- Fuente de evidencia: `05_<skill_name>_IMPLEMENT.md` -> sección `## 6. Tests Executed`
 - Evidencia de tests ejecutados: SÍ / NO
+- Comandos observados: <!-- listar -->
+- Resultados observados: <!-- resumir salida -->
 - Categorías cubiertas: __/5
 - Tests pasando: __/__
 
@@ -147,17 +162,23 @@ Aplicar el checklist **ya cargado** (`AUDIT_CODE_CHECKLIST.md`) y calcular segú
 <!-- Naming, logging, recursos, errores, tipos, docs -->
 
 ## AECF_SCORE_REPORT
-| Categoría | Peso | Score |
-|---|---|---|
-| Scope Validation | 2 | /6 |
-| Security Controls | 3 | /8 |
-| Resource Management | 2 | /4 |
-| Logging & Observability | 2 | /6 |
-| Compliance with PLAN | 3 | /6 |
-| Production Readiness | 2 | /8 |
-| Testing Evidence | 3 | /6 |
-| **Total** | | **/100 normalizado** |
+| Categoría | Peso | Raw Score | Max Raw | Weighted | Max Weighted |
+|---|---|---|---|---|---|
+| Scope Validation | 2 | __ | 6 | __ | 12 |
+| Security Controls | 3 | __ | 8 | __ | 24 |
+| Resource Management | 2 | __ | 4 | __ | 8 |
+| Dep. Outage Resilience | 3 | __ / N/A | 10 | __ / N/A | 30 / N/A |
+| Logging & Observability | 2 | __ | 6 | __ | 12 |
+| Compliance with Previous Phase | 3 | __ | 6 | __ | 18 |
+| Production Readiness | 2 | __ | 8 | __ | 16 |
+| Decision Integrity | 3 | __ | 4 | __ | 12 |
+| Code Audit Integrity | 2 | __ | 6 | __ | 12 |
+| Testing Evidence | 3 | __ | 6 | __ | 18 |
+| Anti-patterns | 3 | __ | 26 | __ | 78 |
+| **Total** | | **__** | **__** | **__** | **__** |
 
+- Raw Score: <!-- weighted score obtained / weighted max -->
+- Normalized Score: <!-- 0-100 -->
 - Maturity Level: <!-- ENTERPRISE READY / PRODUCTION READY / CONDITIONAL / HIGH RISK / FAIL -->
 - Critical Findings: YES / NO
 - Test Evidence Present: YES / NO

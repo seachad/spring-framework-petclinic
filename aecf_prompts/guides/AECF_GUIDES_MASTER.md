@@ -49,6 +49,7 @@ Rule of coherence:
 | [AECF_SURFACE_CONTEXT_MODEL.md](AECF_SURFACE_CONTEXT_MODEL.md) | Model for `business_surface` and `technical_surface` partitioning |
 | [AECF_SURFACE_SELECTION_INTAKE.md](AECF_SURFACE_SELECTION_INTAKE.md) | Intake process to decide when and how to use `surfaces` |
 | [AECF_SKILL_SURFACE_CONTRACT.md](AECF_SKILL_SURFACE_CONTRACT.md) | Common contract for skills that consume `surfaces` |
+| [AECF_MULTI_REPO_SURFACES.md](AECF_MULTI_REPO_SURFACES.md) | **[PROPOSAL]** Multi-repo surface model with contract boundaries and federation manifests |
 
 ## Prompt-Only Operation Guides
 
@@ -79,6 +80,7 @@ The current master guide intentionally references every Markdown guide currently
 - `AECF_EXTERNAL_SKILLS.md`
 - `AECF_GUIDES_MASTER.md`
 - `AECF_MEMORY_MODEL.md`
+- `AECF_MULTI_REPO_SURFACES.md`
 - `AECF_PROJECT_CONTEXT_BOOTSTRAP.md`
 - `AECF_PROMPTS_CLAUDE_CLI.md`
 - `AECF_PROMPTS_CODEX_CLI.md`

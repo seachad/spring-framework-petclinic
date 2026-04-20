@@ -9,6 +9,8 @@ OWNER SEACHAD
 
 If you are reading the published documentation on GitHub Pages, start from `index.html` at the repository root and use `GUIDE_VIEWER.html` to open this guide and the rest of the markdown set without leaving the HTML surface.
 
+If you are working in a target workspace with the prompt-only MCP enabled, you can request this same guide through `aecf_show_guide` so the host renders it in the effective `output_language` and only falls back to a derived translation when no human-maintained localized copy exists.
+
 If you only need to know where to start with `aecf_prompts`, follow this order:
 
 1. Read [AECF_GUIDES_MASTER.md](AECF_GUIDES_MASTER.md)
@@ -21,6 +23,7 @@ If you only need to know where to start with `aecf_prompts`, follow this order:
 8. If you want to extend a base skill with project-local rules, read [AECF_EXTERNAL_SKILLS.md](AECF_EXTERNAL_SKILLS.md)
 9. If you need skill detail, read [../skills/README_SKILLS.md](../skills/README_SKILLS.md)
 10. If you need the full methodology, read [../AECF_METHODOLOGY.md](../AECF_METHODOLOGY.md)
+11. If you want to understand in which way AECF maps with different project management methodologies read [AECF_APPLICATION_LIFECYCLE_GUIDE.md](AECF_APPLICATION_LIFECYCLE_GUIDE.md)
 
 ## Which guide to use depending on the LLM host
 
@@ -32,9 +35,9 @@ If you only need to know where to start with `aecf_prompts`, follow this order:
 ## Minimum recommended order
 
 1. Copy `aecf_prompts/` into the project.
-2. Define topic attribution with `AECF_PROMPTS_USER_ID` or, if that is missing, with `AECF_PROMPTS_MODEL_ID`/`MODEL_ID` or `AECF_PROMPTS_AGENT_ID`/`AGENT_ID`. If the host is ambiguous, validate what the bundle sees with `aecf_prompts\scripts\bootstrap_prompt_only_bundle.exe --diagnose-env`.
+2. Define topic attribution with `AECF_PROMPTS_USER_ID` or, if that is missing, with `AECF_PROMPTS_MODEL_ID`/`MODEL_ID` or `AECF_PROMPTS_AGENT_ID`/`AGENT_ID`. If no variable is available, the system auto-generates a random ID prefixed with `user_`. If the host is ambiguous, validate what the bundle sees with `aecf_prompts\scripts\bootstrap_prompt_only_bundle.exe --diagnose-env`.
 3. Prepare context:
-   - fast path: create `.aecf/runtime/documentation/AECF_PROJECT_CONTEXT.md`
+   - fast path: create `.aecf/documentation/AECF_PROJECT_CONTEXT.md`
    - better path: run `aecf_project_context_generator`
 4. If the repo is large or complex, run `aecf_codebase_intelligence`.
 5. If the repo is large or multi-team, create `surfaces` with help from [AECF_SURFACE_CONTEXT_MODEL.md](AECF_SURFACE_CONTEXT_MODEL.md).
